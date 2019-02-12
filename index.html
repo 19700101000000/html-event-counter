@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Event Counter</title>
+		<meta charset="utf-8">
+		<script>
+var eventList = [
+/**
+{
+	title: 'event title',
+	datetime: 'yyyy/MM/dd HH:mm:ss',
+},
+*/
+{
+	title:    'New Year 2019',
+	datetime: '2019-01-01 00:00:00',
+},
+{
+	title:    'Valentine',
+	datetime: '2019-02-14 00:00:00',
+},
+{
+	title:    'Valentine\'s next day',
+	datetime: '2019-02-15 00:00:00',
+},
+{
+	title:    'New Year 2020',
+	datetime: '2020-01-01 00:00:00',
+}];
+		</script>
+<style>
+div {
+	margin: 1rem;
+	padding: 1rem;
+	border: solid 1px black;
+}
+#previousEvent {
+	color: red;
+}
+#nowEvent {
+	color: green;
+}
+#nextEvent {
+	color: blue;
+}
+</style>
+	</head>
+	<body>
+		<h1>Event Counter</h1>
+		<div id="previousEvent">
+			<h2>Previous Event</h2>
+			<h3></h3>
+			<p></p>
+		</div>
+		<div id="nowEvent">
+			<h2>Event</h2>
+			<h3></h3>
+			<p></p>
+		</div>
+		<div id="nextEvent">
+			<h2>Next Event</h2>
+			<h3></h3>
+			<p></p>
+		</div>
+		<script>
+const events = [
+	undefined,
+	undefined,
+	undefined,
+];
+var nowDate;
+const time = {
+	second: 1000,
+	minute: 1000 * 60,
+	hour:   1000 * 60 * 60,
+	day:    1000 * 60 * 60 * 24,
+}
+
+setInterval(showEvents, 100);
+
+function dumpEvents() {
+	for (const e of events) {
+		console.log(e);
+	}
+}
+function updateEvents() {
+	nowDate = new Date();
+
+	for (let i in events) {
+		events[i] = undefined;
+	}
+
+	for (const e of eventList) {
+		const d = new Date(e.datetime);
+		const diff = d - nowDate;
+		e.diff = Math.abs(diff);
+		if (diff <= 0) {
+			events[0] = e;
+		} else if (!events[1]) {
+			events[1] = e;
+		} else {
+			events[2] = e;
+			break;
+		}
+	}
+}
+function showEvents() {
+	updateEvents();
+
+	const elements = [
+		document.getElementById('previousEvent'),
+		document.getElementById('nowEvent'),
+		document.getElementById('nextEvent'),
+	];
+
+	for (const i in events) {
+		let h3 = elements[i].getElementsByTagName('h3')[0];
+		let p  = elements[i].getElementsByTagName('p')[0];
+		if (events[i]) {
+			h3.textContent = events[i].title;
+
+			const seconds = Math.floor(events[i].diff % time.minute / time.second);
+			const minutes = Math.floor(events[i].diff % time.hour / time.minute);
+			const hours   = Math.floor(events[i].diff % time.day / time.hour);
+			const days    = Math.floor(events[i].diff / time.day);
+
+			let count = days;
+			if (days <= 1)
+				count += ' day ';
+			else
+				count += ' days ';
+			count += hours;
+			if (hours <= 1)
+				count += ' hour ';
+			else
+				count += ' hours ';
+			count += minutes;
+			if (minutes <= 1)
+				count += ' minute ';
+			else
+				count += ' minuts ';
+			count += seconds;
+			if (seconds <= 1)
+				count += ' second';
+			else
+				count += ' seconds';
+			if (i == 0/*i === '0'*/) {
+				p.textContent = 'Passed: ';
+			} else {
+				p.textContent = 'Remaining: ';
+			}
+			p.textContent += count;
+		} else {
+			h3.textContent = '';
+			p.textContent  = 'None';
+		}
+	}
+}
+		</script>
+	</body>
+</html>
